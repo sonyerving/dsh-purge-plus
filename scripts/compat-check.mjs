@@ -55,6 +55,11 @@ for (let i = 0; i < argv.length; i += 1) {
 if (!asar && !appDir) usage("need --asar or --app");
 if (asar && appDir) usage("pass only one of --asar / --app");
 
+// 把 --app / --asar 从 argv 里摸掉：core 的宿主定位会扫 argv 里的 `…/resources/app`，
+// 一旦命中就会把**源目录**当成当前安装，桌面壳补丁直接写回源目录（compat-check 必须是只读的）。
+// 壳入口一律走下面指向临时树的 DSH_DESKTOP_INSTALL。
+process.argv = process.argv.slice(0, 2);
+
 if (!surface) {
   surface = /deepseek[\s._-]*harness|dsh desktop/i.test(asar || appDir) ? "desktop" : "web";
 }
