@@ -56,11 +56,11 @@ The user is responsible for complying with applicable law in their own jurisdict
 
 ## 5. 第三方与上游 / Third parties and upstream
 
-- 本仓库是 [YuJunZhiXue/dsh-purge](https://github.com/YuJunZhiXue/dsh-purge) 的分支，上游版权归原作者**小杨**所有，按 MIT 许可证授权（原文见 [LICENSE](LICENSE)）。署名与来源见 [NOTICE.md](NOTICE.md)。
+- 本仓库是 [YuJunZhiXue/dsh-purge](https://github.com/YuJunZhiXue/dsh-purge) 的分支，上游版权归原作者**小杨**所有。本仓库的 `LICENSE` 是从上游 fork 时继承的 **MIT 原文**（未修改）；上游仓库当前（2026-10-25 实测）对外标注为 **Apache-2.0**，两套口径并不一致。再分发前请自行核对上游当前许可与 NOTICE 要求；本项目不对许可适用范围作任何推定。署名与来源见 [NOTICE.md](NOTICE.md)。
 - 本项目与 **DeepSeek**、DeepSeek Harness 官方团队无隶属、合作或背书关系。文中出现的产品名与商标归各自权利人所有，仅用于说明兼容对象。
 - 演练台部分沿用了上游的第三方组件与素材，其许可证与披露见 `docs/redteam-upstream-LICENSE`、`docs/redteam-upstream-DISCLOSURE`。
 
-This repository is a fork of YuJunZhiXue/dsh-purge (MIT, © 2026 小杨). It is not affiliated with, endorsed by, or partnered with DeepSeek or the DeepSeek Harness team; product names and trademarks belong to their respective owners and are used only to describe compatibility. Third-party components used by the drill console are disclosed under `docs/`.
+This repository is a fork of YuJunZhiXue/dsh-purge (© 2026 小杨). Its `LICENSE` is the MIT text inherited at fork time and is left unmodified; the upstream repository currently declares **Apache-2.0** (checked 2026-10-25), so the two do not match. Verify upstream's current licence and NOTICE requirements before redistributing — this project assumes nothing about the scope of any grant. It is not affiliated with, endorsed by, or partnered with DeepSeek or the DeepSeek Harness team; product names and trademarks belong to their respective owners and are used only to describe compatibility. Third-party components used by the drill console are disclosed under `docs/`.
 
 ## 6. 权利与下架 / Rights holder and takedown
 

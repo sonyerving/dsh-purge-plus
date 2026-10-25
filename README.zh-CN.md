@@ -4,9 +4,9 @@
 
 <h1 align="center">⚔️ DeepSeek Harness 网络安全红队工具（dsh-purge）</h1>
 
-<p align="center"><strong>Version 1.4.6 · 本分支 fork</strong> · 适配 DSH <strong>0.2.1-rc.3</strong></p>
+<p align="center"><strong>Version 1.4.7 · 本分支 fork</strong> · 适配 DSH <strong>0.2.1-rc.3</strong></p>
 
-> **这是 fork，不是上游。** 原项目：[YuJunZhiXue/dsh-purge](https://github.com/YuJunZhiXue/dsh-purge)，原作者 **小杨**（[@YuJunZhiXue](https://github.com/YuJunZhiXue)），MIT 许可证（`Copyright (c) 2026 小杨`，本仓库原样保留）。
+> **本分支 fork**：原项目 **小杨**（[@YuJunZhiXue](https://github.com/YuJunZhiXue)）。本仓库 `LICENSE` 是 fork 时继承的 MIT 原文（`Copyright (c) 2026 小杨`，未修改）；上游当前标注 **Apache-2.0**，两边口径不一致，再分发前请自行核对（见 [NOTICE.md](NOTICE.md)）。
 > 本仓库 fork 自 **[@JeffKeeping](https://github.com/JeffKeeping)** 的 [JeffKeeping/dsh-purge-plus](https://github.com/JeffKeeping/dsh-purge-plus)—— **0.2.1-rc.2 适配、破甲内核 v3、设置页重做** 由那边完成；本仓库由 **[@sonyerving](https://github.com/sonyerving)** 维护，在其基础上继续做版本适配、缺陷修复与发版。不改变插件用途与能力范围。
 > 逐条对比上一版（1.2.0）优化与新增了什么：**[CHANGELOG.md](CHANGELOG.md)**。
 > 1.4.0 的审批档位 / 审计流水 / 严格 JSON / 修订号借鉴了 [Minglink/dsh-infinite-gen-5](https://github.com/Minglink/dsh-infinite-gen-5)，来源与边界见 [NOTICE.md](NOTICE.md)。
@@ -16,6 +16,7 @@
 > **1.4.4 修两处静默失效**：`hostFs` 补上 fd 型同步方法（否则 `.bak` 备份一个都建不出、CLI shim 被误报 `binary`），`repairOfficialCliAfterUnpack` 补 `await`（否则未处理拒绝直接终止宿主）。
 > **1.4.5 建好发版链路**：推送 `main` 自动建 Release 并附 zip；`package.json` 的仓库地址与安装地址改指本分支，不再指向上游；清理文档里的版本漂移。补丁表仍是 80 条，宿主行为不变。
 > **1.4.6 适配 DSH 0.2.1-rc.3**：**零锚点漂移**——80 条补丁在 rc.3 上逐条状态与 rc.2 完全一致（唯一变了的补丁目标文件 `dsh-llm-deepseek/lib/index.js` 仍然命中 #69/#72，桌面壳只差三行），所以本版只改 `dshTarget` 与自检工具：`scripts/compat-check.mjs` 现在连桌面壳补丁（#45/#46/#82/#83/#84）一起验，不再一律报 missing。明细见 [docs/compat-0.2.1-rc.3.md](docs/compat-0.2.1-rc.3.md)。
+> **1.4.7 修更新目标与文档**：插件内「更新 / 切换到正式版」的仓库与分支改成从 `package.json` 推导（本仓库 `main`），不再写死上游 `YuJunZhiXue/dsh-purge` 的 `master`——以前点下去会把上游装进来、把 rc.3 适配覆盖掉。README 同时修掉不存在的 npm 安装路径（`dsh-purge` 没发布）、已删除的 `/rewind` 功能、过期的 `autoApplyOnStart: true`，并把「上游暂停更新」改成事实上游已恢复 + 本分支定位，补上 MIT/Apache-2.0 许可口径差异。
 > 变更清单与署名要求见 [NOTICE.md](NOTICE.md)；使用前提、无担保与法律声明见 [DISCLAIMER.md](DISCLAIMER.md)。
 > 上游的**非商用**条款沿用：禁止商业售卖、付费倒卖与黑灰产牟利。
 
@@ -42,7 +43,7 @@
   <a href="README.md">English</a> | <a href="README.zh-CN.md">中文</a>
 </p>
 
-> **上游维护状态。** 原作者因工作安排暂停更新上游（不再发版、暂不收 issue / PR）。本分支只为「官方 0.2.1-rc.3 能装上、界面能用」而维护，不承诺长期跟进；上游恢复后请优先回到上游。
+> **上游状态与本分支定位。** 上游已恢复维护（2026-10-24 发布 v1.1.78，之后仍有新提交），要上游版本请优先用 [YuJunZhiXue/dsh-purge](https://github.com/YuJunZhiXue/dsh-purge)。本分支只做三件事：官方 **0.2.1-rc.x 的桌面 / Web 适配**、本机实测过的缺陷修复、以及本仓库自己的发版链路；不追上游功能，也不改变插件用途。两边版本号各自独立（本分支 1.4.x，上游 1.1.x），二选一，不要互相覆盖。
 
 > **官方 Web 和官方桌面端都支持。** 官方 `dsh web` 用 profile `web`；官方桌面 EXE（DeepSeek Harness **0.2.1-rc.3**）用 profile `desktop`。两边分开安装、分开点「应用」。当前版本适配 dsh 0.2（含 0.2.1-rc.3）；更早的 dsh 用对应的老版本插件。社区桌面端不维护。
 >
@@ -79,7 +80,7 @@ Harness 不只是把问题交给模型。它还会在运行时改提示词、审
 | **清洗**           | 分组查看补丁，应用、还原、卸载；编辑提示词和多套规则                      |
 | **演练台**          | 正式版内置。授权后查看资产、技能和本机环境。只用于你有权管理的本机、离线靶标或已书面授权的演练 |
 | **宿主策略**         | 调整默认文案、权限策略和工具上限。官方能力保留，不另写一套身份                 |
-| **启动时**          | 自动再检查并应用。npm 升级盖掉 `node_modules` 之后不用手改文件       |
+| **启动时**          | 只对齐应用状态：文件已经改好就补状态戳，改宿主要点「应用」。npm 升级盖掉 `node_modules` 后再点一次应用即可 |
 
 
 不写死盘符。按 `$DSH_HOME`、dsh 启动器旁边的 `.dsh`，再退回 `~/.dsh`。不改 Harness 源码仓库，在 **设置 → Purge** 里点「应用」才写入。身份来自插件里的加密提示词，也就是提示词框默认显示的那一份。不读取宿主磁盘上的提示词文件。
@@ -157,7 +158,7 @@ Harness 不只是把问题交给模型。它还会在运行时改提示词、审
 
 最新版只支持 **dsh 0.2**，不要拿它去打 0.1.x。
 
-- **dsh 0.2**（官方桌面 **0.2.1-rc.3** / 0.2.1-rc.2 / 0.2.0-rc.2 / 官方 `dsh web`）：用 **1.2.0** 及以上；**1.4.6** 是实测对 0.2.1-rc.3 的那一版。本页命令装的就是这一档。
+- **dsh 0.2**（官方桌面 **0.2.1-rc.3** / 0.2.1-rc.2 / 0.2.0-rc.2 / 官方 `dsh web`）：用 **1.2.0** 及以上；**1.4.6 / 1.4.7** 是实测对 0.2.1-rc.3 的版本。本页命令装的就是这一档。
 - **dsh 0.1.7**（含 rc.1 / rc.2）：用 **1.1.39** 及更早 —— 在 [Releases](https://github.com/YuJunZhiXue/dsh-purge/releases) 里选对应标签。
 
 对不上的补丁会显示待应用或跳过，不会乱改文件。
@@ -171,23 +172,23 @@ Harness 不只是把问题交给模型。它还会在运行时改提示词、审
 **Web（官方 `dsh web`）**
 
 ```sh
-dsh plugin --profile web add dsh-purge
+dsh plugin --profile web add https://github.com/sonyerving/dsh-purge-plus/archive/refs/heads/main.tar.gz
 ```
 
 **桌面端（官方 EXE）**
 
 ```sh
-dsh plugin --profile desktop add dsh-purge
+dsh plugin --profile desktop add https://github.com/sonyerving/dsh-purge-plus/archive/refs/heads/main.tar.gz
 ```
 
-当前目录已经是本仓库时，把包名换成 `add .`。`dsh` 不在 PATH 时走 [手动安装](#manual)。registry 上不去：同一个 `--profile`，把目标换成 `https://github.com/sonyerving/dsh-purge-plus/archive/refs/heads/main.tar.gz`。
+`dsh plugin` 是往 profile 里转给 pnpm 的，所以必须给可安装的地址：`dsh-purge` **没有发布到 npm**，写 `add dsh-purge` 会报 404。当前目录已经是本仓库时，把地址换成 `add .`。`dsh` 不在 PATH 时走 [手动安装](#manual)。
 
-[插件市场](https://dsh-plugin.org/plugins/yujunzhixue/dsh-purge) 一键安装会按本仓库反查 npm，命中后装 `dsh-purge`。目录页可能仍写 `github:` —— 按钮若退回 git，用上表命令。
+[插件市场](https://dsh-plugin.org/plugins/yujunzhixue/dsh-purge) 里那一页是**上游** `yujunzhixue/dsh-purge` 的条目，它的 npm 包也不存在，按钮常常退回 git。装本分支请用上面的 tarball 命令（或下面的 `dsh://` 按钮）。
 
 桌面客户端也可以点按钮（`dsh://` 唤起）：
 
 <p align="center">
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.4.6&repo=sonyerving%2Fdsh-purge-plus&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2Fsonyerving%2Fdsh-purge-plus%2Farchive%2Frefs%2Fheads%2Fmain.tar.gz"><strong>唤起客户端一键安装</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.4.7&repo=sonyerving%2Fdsh-purge-plus&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2Fsonyerving%2Fdsh-purge-plus%2Farchive%2Frefs%2Fheads%2Fmain.tar.gz"><strong>唤起客户端一键安装</strong></a>
 </p>
 
 ### 装完都要做这三步
@@ -217,18 +218,18 @@ Web 的控件只动 Web，桌面端的只动桌面应用。不要在一个宿主
 
 安装 DeepSeek Harness 插件 `dsh-purge`，Web 和官方桌面端都要装。不要全盘搜索，不要读或改其它文件，不要应用设置，也不要重启应用。
 
-`dsh` 不在 PATH 就告诉用户后停止。当前目录已是本仓库时，把下面两条里的包名都换成 `.`。npm registry 上不去，把包名换成 `https://github.com/sonyerving/dsh-purge-plus/archive/refs/heads/main.tar.gz`。某个 profile 不存在就跳过那一条，另一条照装。
+`dsh` 不在 PATH 就告诉用户后停止。当前目录已是本仓库时，把下面两条里的地址都换成 `.`。`dsh-purge` 没有发布到 npm，不要写包名。某个 profile 不存在就跳过那一条，另一条照装。
 
 **Web 端（官方 `dsh web`）**
 
 ```sh
-dsh plugin --profile web add dsh-purge
+dsh plugin --profile web add https://github.com/sonyerving/dsh-purge-plus/archive/refs/heads/main.tar.gz
 ```
 
 **桌面端（官方 EXE）**
 
 ```sh
-dsh plugin --profile desktop add dsh-purge
+dsh plugin --profile desktop add https://github.com/sonyerving/dsh-purge-plus/archive/refs/heads/main.tar.gz
 ```
 
 命令结束后，提醒用户：Web 完全退出并重启 `dsh web`；桌面端退出托盘再打开 EXE。各自打开 **设置 → Purge** 点「应用」。然后停止。
@@ -329,7 +330,7 @@ dsh-purge --uninstall
       name: 'dsh-purge'
       config:
         enabled: true
-        autoApplyOnStart: true
+        autoApplyOnStart: false
         autoUpdateOnStart: false
         autoRevertOnMissing: false
         verbose: false
@@ -341,7 +342,7 @@ dsh-purge --uninstall
 
 ## 界面预览
 
-**主入口在设置里**（1.3.0）：设置左侧导航最后一行「破甲」，点开就是完整面板。面板用 DSH 自己的设计 token 画——720px 单列、0.5px 描边的卡片、36px 按钮、32px 输入框，和「模型」「通用设置」同一套观感。
+**主入口在设置里**（1.3.0）：设置左侧导航最后一行 **Purge**，点开就是完整面板。面板用 DSH 自己的设计 token 画——720px 单列、0.5px 描边的卡片、36px 按钮、32px 输入框，和「模型」「通用设置」同一套观感。
 
 ![设置页](docs/preview/settings-1.3.1.png)
 
@@ -357,7 +358,7 @@ dsh-purge --uninstall
 
 第一次进演练台要先读声明、等倒计时、滚到文末并勾选三项。清洗不需要这一步。演练台只用于你有权管理的本机、离线靶标，或已经书面授权的演练环境。
 
-**清洗（浮窗）**
+**清洗（设置页·破甲段）**
 
 ![清洗](docs/preview/dock-clean.png)
 
@@ -416,17 +417,14 @@ dsh-purge --edit
 /purge status | apply | revert | uninstall | edit | help
 /rules list | use <id> | create <id> | delete <id> | reset | help
 /skills list | import <压缩包或文件夹> | create <id> [说明] | delete <id> | help
-/rewind
 
 # 模型工具
 purge_status   purge_apply   purge_revert
 ```
 
-设置页「应用」成功后会自动重启，以加载已改的包文件；也可手动点「重启」。补丁标题下有正式版和测试版。测试版跟 `beta` 分支。点「切换到正式版」会装回 master，并清掉钉选。正式版里选旧版本会固定在该版本，要回到最新再点「更新」。旧的测试标签不再列出。
+设置页「应用」成功后会自动重启，以加载已改的包文件；也可手动点「重启」。补丁标题下有正式版和测试版。正式版跟本仓库的 `main` 分支，测试版跟 `beta`（本仓库目前没有这条分支，所以只能看到正式版）。点「切换到正式版」会装回 `main` 的最新提交，并清掉钉选。正式版里选旧版本会固定在该版本，要回到最新再点「更新」。旧的测试标签不再列出。
 
-输入框旁的「回退一次」和「回退上一轮」跟官方 DSH `session.fork({ atSeq })`：撤回已进行的那一轮，新会话接上之前的上下文，旧会话归档，那句回到输入框，再发送会重新注入。聊天里 `/rewind` 同样可用。
-
-**极简 / PTC 与标准不一致时**：同一任务在标准模式能跑、在极简或 PTC 被拦，通常是 preset 里 `run_code` 或 plan 拦截句没洗净，或内置 minimal 缺少 `agent-instructions`。请升到 **1.1.61+**，**完全退出宿主 → 清洗里应用 → 自动重启 → 新开一轮对话** 再试；只换 preset 不重应用，旧进程里的补丁不会更新。
+**极简 / PTC 与标准不一致时**：同一任务在标准模式能跑、在极简或 PTC 被拦，通常是 preset 里 `run_code` 或 plan 拦截句没洗净，或内置 minimal 缺少 `agent-instructions`。请升到 **1.4.6 及以上**（本页装的就是），**完全退出宿主 → 清洗里应用 → 自动重启 → 新开一轮对话** 再试；只换 preset 不重应用，旧进程里的补丁不会更新。
 
 ### 响应速度
 
@@ -478,9 +476,10 @@ DSH 会按顺序执行同一批中的 Bash 调用。旧版 dsh-purge 把默认�
 ```sh
 node --check lib/index.js
 node --check lib/core.js
-node --check lib/rewind.js
+node --check lib/reapply.js
 node --check lib/skills.js
 node --check client.js
+node scripts/compat-check.mjs --app "<安装根>/resources/app" --surface desktop
 ```
 
 ---
@@ -586,12 +585,14 @@ flowchart LR
 
 每一版改了什么、安装包在 [Releases](https://github.com/sonyerving/dsh-purge-plus/releases)。发新版时把 `package.json` 的版本号改掉（`version` 与 `dsh.version` 两处），中英文说明写进 `release-notes.md` 且首行必须是 `# <版本>`，推到 `main` 就会自动建 Release 并附 zip。同一版本再推送不会重复发包。
 
+插件里的「更新 / 切换到正式版」从 **1.4.7** 起指向本仓库的 `main`（以前写死上游 `YuJunZhiXue/dsh-purge` 的 `master`，点下去会把上游装进来）。还停在 1.4.6 及更早时，请先用[安装](#安装)里的 tarball 命令重装一次，之后就能用面板里的更新。
+
 ## 说明
 
 - 改动范围是本机 `@deepseek-ai/*` 包里的渲染文案、默认策略和执行逻辑，以及用户目录下的覆盖文件与规则集。
 - 升级后原文对不上会显示跳过，这次应用仍算完成，不会乱改。
 - 不改动非 `@deepseek-ai` 的第三方插件源仓库（启动时的 CMD 无感会**尽力**修补已装的 doctor / market / 梁神 / mnemon，属运行时补丁）。
-- 安装走 npm 包名 `dsh-purge`：`dsh plugin --profile web add dsh-purge` 或 `dsh plugin --profile desktop add dsh-purge`。当前目录已是本仓库时 `add .`。registry 上不去再加 master.tar.gz。插件市场一键安装走同一个 npm 包。
+- 安装用本仓库的 tarball：`dsh plugin --profile web|desktop add https://github.com/sonyerving/dsh-purge-plus/archive/refs/heads/main.tar.gz`。当前目录已是本仓库时 `add .`。`dsh-purge` 不在 npm 上，写包名会 404；手动安装见[安装](#安装)。
 
 ---
 

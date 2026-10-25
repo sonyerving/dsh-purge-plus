@@ -9,10 +9,10 @@ This repository is a **fork** of **[YuJunZhiXue/dsh-purge](https://github.com/Yu
 | 原项目 | dsh-purge — DeepSeek Harness 网络安全红队评测与「破甲」插件 |
 | 原作者 | **小杨**（GitHub: [@YuJunZhiXue](https://github.com/YuJunZhiXue)） |
 | 上游仓库 | https://github.com/YuJunZhiXue/dsh-purge |
-| 上游许可证 | MIT，`Copyright (c) 2026 小杨`（见 [LICENSE](LICENSE)，本分支原样保留） |
+| 上游许可证 | **以 fork 当日为准**：本仓库 `LICENSE` 是从上游继承的 MIT 原文（`Copyright (c) 2026 小杨`），**原文未改**；上游仓库当前（2026-10-25 实测）标注的是 **Apache-2.0**。两者口径不同，再分发/二次开发前请先核对上游当前许可 |
 | 中间分支 | [JeffKeeping/dsh-purge-plus](https://github.com/JeffKeeping/dsh-purge-plus)：完成 0.2.1-rc.2 适配、破甲内核 v3、设置页重做 |
 | 本仓库 | **sonyerving/dsh-purge-plus**：fork 自上一行，继续做版本适配、缺陷修复与发版 |
-| 本分支版本 | 1.4.6，`dshTarget: 0.2.1-rc.3` |
+| 本分支版本 | 1.4.7，`dshTarget: 0.2.1-rc.3` |
 
 上游 README 要求：**借用本项目的名称、思路、代码或提示词，必须署名并写明来源仓库**。本仓库保留原作者署名、上游链接与原始 MIT 许可证文本；这是使用条件，不是可选项。
 
@@ -23,6 +23,11 @@ The upstream project requires attribution and a link back to its repository when
 ## 本分支改了什么 / What this fork changes
 
 只改「适配新版 + 界面 + 一处补丁锚点」，不改变插件的用途与能力范围。
+
+**修更新目标与文档（1.4.7）**
+
+- 插件内「更新 / 切换到正式版」的仓库与分支现在从 `package.json` 推导（本仓库 `main`），旧客户端 / 旧 pin 里的 `master` 自动映射到 `main`。以前写死上游 `YuJunZhiXue/dsh-purge` + `master`，fork 上点更新会把上游装进来。
+- 文档修正：去掉不存在的 npm 安装路径（`dsh-purge` 未发布，`dsh plugin add dsh-purge` 报 404）、已删除的 `/rewind` 与回退按钮段落、过期的 `autoApplyOnStart: true`、错写成 `master.tar.gz` 的安装地址；「上游暂停更新」改成事实上游已恢复 + 本分支定位；补上 MIT / Apache-2.0 许可口径差异。
 
 **适配 DSH 0.2.1-rc.3（1.4.6）**
 
@@ -87,4 +92,4 @@ The plaintext prompt source (`lib/default-prompt-inject.md`) is intentionally no
 
 The upstream project forbids commercial sale, paid resale, and any profit from gray- or black-market use. This fork carries the same term unchanged.
 
-如要基于本分支二次开发，请同时保留：原作者署名、上游仓库链接、MIT 许可证全文、以及这条非商用声明。
+如要基于本分支二次开发，请同时保留：原作者署名、上游仓库链接、`LICENSE` 全文（本项目继承的 MIT 文本）、以及这条非商用声明。**若你合并了上游当前代码**，上游的 Apache-2.0 条款与 NOTICE 要求同时适用，请自行核对。

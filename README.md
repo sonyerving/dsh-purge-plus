@@ -4,9 +4,9 @@
 
 <h1 align="center">⚔️ DeepSeek Harness cybersecurity red-team tool (dsh-purge)</h1>
 
-<p align="center"><strong>Version 1.4.6 · fork</strong> · targets DSH <strong>0.2.1-rc.3</strong></p>
+<p align="center"><strong>Version 1.4.7 · fork</strong> · targets DSH <strong>0.2.1-rc.3</strong></p>
 
-> **This is a fork, not upstream.** Original project: [YuJunZhiXue/dsh-purge](https://github.com/YuJunZhiXue/dsh-purge) by **小杨** ([@YuJunZhiXue](https://github.com/YuJunZhiXue)), MIT licence (`Copyright (c) 2026 小杨`, kept verbatim here).
+> **This is a fork of [YuJunZhiXue/dsh-purge](https://github.com/YuJunZhiXue/dsh-purge)** by **小杨** ([@YuJunZhiXue](https://github.com/YuJunZhiXue)). This repository's `LICENSE` is the MIT text inherited at fork time (`Copyright (c) 2026 小杨`, unmodified); upstream currently declares **Apache-2.0**, so the two do not match — verify before redistributing (see [NOTICE.md](NOTICE.md)).
 > This repository is forked from **[@JeffKeeping](https://github.com/JeffKeeping)**'s [JeffKeeping/dsh-purge-plus](https://github.com/JeffKeeping/dsh-purge-plus) — the **0.2.1-rc.2 compatibility work, prompt kernel v3, and the rebuilt settings UI** come from there. This copy is maintained by **[@sonyerving](https://github.com/sonyerving)**, which continues version compatibility, bug fixes, and releases on top of it. It does not change what the plugin does.
 > What changed against the previous release (1.2.0), item by item: **[CHANGELOG.md](CHANGELOG.md)**.
 > 1.4.0 borrows the approval tier, audit trail, strict JSON boundary and revision guard from [Minglink/dsh-infinite-gen-5](https://github.com/Minglink/dsh-infinite-gen-5); scope and boundaries in [NOTICE.md](NOTICE.md).
@@ -16,6 +16,7 @@
 > **1.4.4 fixes two silent failures**: `hostFs` now exposes the fd-based sync methods (without them no `.bak` backup could be created and CLI shims were misreported as `binary`), and `repairOfficialCliAfterUnpack` now awaits (an unhandled rejection used to terminate the host).
 > **1.4.5 wires up publishing**: pushing `main` now creates a GitHub Release with a zip; the repository and install URLs in `package.json` point at this fork instead of upstream; stale version references in the docs were cleaned up. The patch table is still 80 entries and host behaviour is unchanged.
 > **1.4.6 targets DSH 0.2.1-rc.3**: no pattern had to change — all 80 patches settle identically on rc.3 (the only target file that differs, `dsh-llm-deepseek/lib/index.js`, keeps the #69/#72 anchors, and the desktop shell differs by three lines). `scripts/compat-check.mjs` now also verifies the desktop-shell patches (#45/#46/#82/#83/#84) instead of reporting them as missing. Details: [docs/compat-0.2.1-rc.3.md](docs/compat-0.2.1-rc.3.md).
+> **1.4.7 fixes the in-plugin updater and the docs**: the update target is now derived from `package.json` (this fork's `main`) instead of the hard-coded upstream `YuJunZhiXue/dsh-purge` + `master`, so "Switch to stable" no longer installs upstream over this fork. The READMEs also drop the non-existent npm install path (`dsh-purge` is not on npm), the removed `/rewind` feature and the stale `autoApplyOnStart: true` default, and record upstream's return to development plus the MIT/Apache-2.0 licence mismatch.
 > Changes and attribution: [NOTICE.md](NOTICE.md). Preconditions, no-warranty and legal terms: [DISCLAIMER.md](DISCLAIMER.md).
 > The upstream **non-commercial** term carries over: no paid resale, no gray- or black-market profit.
 
@@ -42,13 +43,13 @@
   <a href="README.md">English</a> | <a href="README.zh-CN.md">中文</a>
 </p>
 
-> **Upstream status.** The original author has paused upstream development (no new releases, issues / PRs not taken). This fork is maintained only so the official 0.2.1-rc.3 build installs and its UI works; no long-term tracking is promised. When upstream resumes, prefer it.
+> **Upstream status and where this fork stands.** Upstream is maintained again (v1.1.78 shipped 2026-10-24, with commits after it); if you want upstream, use [YuJunZhiXue/dsh-purge](https://github.com/YuJunZhiXue/dsh-purge). This fork does exactly three things: **0.2.1-rc.x desktop / Web compatibility**, bug fixes verified on a real install, and its own release pipeline. It does not chase upstream features and does not change what the plugin does. The two version lines are independent (this fork 1.4.x, upstream 1.1.x) — pick one, do not overwrite each other.
 
 > **Official Web and the official desktop app are both supported.** Official `dsh web` uses profile `web`. The official desktop EXE (DeepSeek Harness **0.2.1-rc.3**) uses profile `desktop`. Install and Apply them separately. This release targets dsh 0.2, including 0.2.1-rc.3. Older dsh builds need the matching older plugin. Community Desktop is not maintained.
 >
 > Adding the plugin to a profile does not patch the host. Open **Settings → Purge** → **Apply**. A successful Apply restarts; an unfinished Apply does not. After the restart, start a new chat - that is when the inject enters the session.
 >
-> Node.js **≥18**. Windows no-flash needs **Node ≥22**. Hub one-click and the commands below both install the npm package `dsh-purge`.
+> Node.js **≥18**. Windows no-flash needs **Node ≥22**. The commands below install from this repository's tarball (`dsh-purge` is not on npm).
 
 ## Contents
 
@@ -78,7 +79,7 @@ Harness does more than forward a prompt. It rewrites prompts, approval gates, sa
 | **Clean** | Grouped patch status, Apply / Restore / Uninstall, prompt editor, multiple rule sets |
 | **Drill** | Built into the stable release. After authorization: assets, skills, and the local environment. Only for a host you manage, an offline target, or a written authorized exercise |
 | **Host policy** | Default copy, permission policy, and tool limits. Official capabilities stay. No second invented identity |
-| **On start** | Checks and reapplies. After npm overwrites `node_modules`, you do not hand-edit files |
+| **On start** | Only aligns the applied stamp: if the host files already match, the stamp is kept. Writing the host needs **Apply**; after an npm upgrade wipes `node_modules`, click Apply once |
 
 No hardcoded drive letters. It looks at `$DSH_HOME`, `.dsh` next to the dsh launcher, then `~/.dsh`. It does not patch the Harness source tree. **Apply** on the **Clean** page of **dsh-purge** is what writes the changes. Identity comes from the encrypted prompt shipped in the plugin, the text the prompt box shows by default. The host prompt file is not read.
 
@@ -159,7 +160,7 @@ WeChat name **「老张的ai科技」**, same handle as the live-room viewer boa
 
 The latest plugin supports **dsh 0.2** only — do not apply it to 0.1.x.
 
-- **dsh 0.2** (official desktop **0.2.1-rc.3** / 0.2.1-rc.2 / 0.2.0-rc.2 / official `dsh web`): use **1.2.0** or newer; **1.4.6** is the release measured against 0.2.1-rc.3. This page installs that line.
+- **dsh 0.2** (official desktop **0.2.1-rc.3** / 0.2.1-rc.2 / 0.2.0-rc.2 / official `dsh web`): use **1.2.0** or newer; **1.4.6 / 1.4.7** are the releases measured against 0.2.1-rc.3. This page installs that line.
 - **dsh 0.1.7** (incl. rc.1 / rc.2): use **1.1.39** or older — pick the tag on [Releases](https://github.com/YuJunZhiXue/dsh-purge/releases).
 
 Unmatched patches stay pending or skipped; nothing is rewritten blindly.
@@ -173,23 +174,23 @@ Web and the official desktop EXE are the two maintained hosts. **Install both. A
 **Web (official `dsh web`)**
 
 ```sh
-dsh plugin --profile web add dsh-purge
+dsh plugin --profile web add https://github.com/sonyerving/dsh-purge-plus/archive/refs/heads/main.tar.gz
 ```
 
 **Desktop (official EXE)**
 
 ```sh
-dsh plugin --profile desktop add dsh-purge
+dsh plugin --profile desktop add https://github.com/sonyerving/dsh-purge-plus/archive/refs/heads/main.tar.gz
 ```
 
-If this directory is already a clone, use `add .` instead of the package name. If `dsh` is not on PATH, use [Manual install](#manual). Registry blocked: add `https://github.com/sonyerving/dsh-purge-plus/archive/refs/heads/main.tar.gz` with the same `--profile`.
+`dsh plugin` forwards to pnpm inside the profile, so it needs an installable location: `dsh-purge` is **not published to npm**, and `add dsh-purge` fails with a 404. If this directory is already a clone, use `add .` instead of the URL. If `dsh` is not on PATH, use [Manual install](#manual).
 
-Hub one-click on [dsh-plugin.org](https://dsh-plugin.org/plugins/yujunzhixue/dsh-purge) searches npm for this repository and installs `dsh-purge`. The catalog line may still show `github:` — use the command above if the button falls back to git.
+The [dsh-plugin.org page](https://dsh-plugin.org/plugins/yujunzhixue/dsh-purge) is the **upstream** `yujunzhixue/dsh-purge` entry; its npm package does not exist either, so the button often falls back to git. To install this fork, use the tarball command above (or the `dsh://` button below).
 
 For the desktop client you can also click the button (`dsh://` deep link):
 
 <p align="center">
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.4.6&repo=sonyerving%2Fdsh-purge-plus&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2Fsonyerving%2Fdsh-purge-plus%2Farchive%2Frefs%2Fheads%2Fmain.tar.gz"><strong>Install in desktop client</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.4.7&repo=sonyerving%2Fdsh-purge-plus&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2Fsonyerving%2Fdsh-purge-plus%2Farchive%2Frefs%2Fheads%2Fmain.tar.gz"><strong>Install in desktop client</strong></a>
 </p>
 
 ### After the command: three steps
@@ -219,18 +220,18 @@ Paste the block below to a local assistant. It should only run the install comma
 
 Install the DeepSeek Harness plugin `dsh-purge` into both the Web profile and the official desktop profile. Do not scan the whole disk, do not read or edit other files, do not apply settings, and do not restart the app.
 
-If `dsh` is not on PATH, tell the user and stop. If this directory is already a clone, use `.` instead of the package name in both commands. If the npm registry is blocked, use `https://github.com/sonyerving/dsh-purge-plus/archive/refs/heads/main.tar.gz`. If one profile is missing, skip that command and still install the other.
+If `dsh` is not on PATH, tell the user and stop. If this directory is already a clone, use `.` instead of the URL in both commands. `dsh-purge` is not published to npm, so do not use the bare package name. If one profile is missing, skip that command and still install the other.
 
 **Web (official `dsh web`)**
 
 ```sh
-dsh plugin --profile web add dsh-purge
+dsh plugin --profile web add https://github.com/sonyerving/dsh-purge-plus/archive/refs/heads/main.tar.gz
 ```
 
 **Desktop (official EXE)**
 
 ```sh
-dsh plugin --profile desktop add dsh-purge
+dsh plugin --profile desktop add https://github.com/sonyerving/dsh-purge-plus/archive/refs/heads/main.tar.gz
 ```
 
 After the commands finish, tell the user to fully quit and restart `dsh web`, and to quit the desktop tray then reopen the EXE. On each host, open **dsh-purge** beside the session title and **Apply** on **Clean**. Then stop.
@@ -331,7 +332,7 @@ Plugin config lives in `cordis.patch.yml` (`postPrompt` is empty by default):
       name: 'dsh-purge'
       config:
         enabled: true
-        autoApplyOnStart: true
+        autoApplyOnStart: false
         autoUpdateOnStart: false
         autoRevertOnMissing: false
         verbose: false
@@ -359,7 +360,7 @@ There is no in-conversation button any more: Settings is the only surface. The p
 
 The first time you open Drill you read the notice, wait out the countdown, scroll to the end, and check three boxes. Clean does not need that step. Drill is only for a host you manage, an offline target, or an exercise that already has written authorization.
 
-**Clean (dock)**
+**Clean (Armor segment)**
 
 ![Clean](docs/preview/dock-clean.png)
 
@@ -410,16 +411,14 @@ dsh-purge --edit
 /purge status | apply | revert | uninstall | edit | help
 /rules list | use <id> | create <id> | delete <id> | reset | help
 /skills list | import <zip-or-folder> | create <id> [description] | delete <id> | help
-/rewind
 
 purge_status   purge_apply   purge_revert
 ```
 
-After a successful Apply, the host restarts so patched packages load; you can also click **Restart** manually. Under the patch title are the stable release and the test release. The test release follows the `beta` branch. **Switch to stable** installs `master` and clears any pin. Picking an older stable version pins it; click **Update** to return to the latest. Old test tags are not listed.
+After a successful Apply, the host restarts so patched packages load; you can also click **Restart** manually. Under the patch title are the stable release and the test release. Stable follows this repository's `main` branch; the test lane follows `beta`, which this repository does not have (so only stable shows up). **Switch to stable** installs the latest `main` commit and clears any pin. Picking an older stable version pins it; click **Update** to return to the latest. Old test tags are not listed.
 
-The composer **Undo once** and **Undo last round** follow official DSH `session.fork({ atSeq })`: the withdrawn turn is cut off, a new session keeps the earlier context, the old session is archived, and the line returns to the input so **send again** re-injects. `/rewind` does the same.
 
-If the **same task works in standard but fails in minimal or PTC**, preset `run_code`, sandbox, or plan intercept text is often still uncleared, or built-in minimal is missing `agent-instructions`. Use **1.1.61+**, then **quit the host fully → Apply in Clean → restart → start a new chat**. Switching preset alone does not reload patches in the running process.
+If the **same task works in standard but fails in minimal or PTC**, preset `run_code`, sandbox, or plan intercept text is often still uncleared, or built-in minimal is missing `agent-instructions`. Use **1.4.6 or newer** (what this page installs), then **quit the host fully → Apply in Clean → restart → start a new chat**. Switching preset alone does not reload patches in the running process.
 
 ### Response speed
 
@@ -475,9 +474,10 @@ node --check lib/surface.js
 node --check lib/web.js
 node --check lib/desktop.js
 node --check lib/host.js
-node --check lib/rewind.js
+node --check lib/reapply.js
 node --check lib/skills.js
 node --check client.js
+node scripts/compat-check.mjs --app "<install>/resources/app" --surface desktop
 ```
 
 ---
@@ -584,7 +584,7 @@ What changed, and the zip, are on [Releases](https://github.com/sonyerving/dsh-p
 - Scope is rendered copy, defaults, and runtime logic inside local `@deepseek-ai/*` packages, plus override files and rule sets under the harness home.
 - After an upgrade, unmatched originals show as skipped. Apply still completes, and those files are left unchanged.
 - Third-party plugin *source repos* outside `@deepseek-ai` are left alone (CMD silence may **best-effort** patch installed doctor / market / liangshen / mnemon at runtime).
-- Install the npm package `dsh-purge`: `dsh plugin --profile web add dsh-purge` or `dsh plugin --profile desktop add dsh-purge`. From this repo, `add .`. If the registry is blocked, add the master.tar.gz URL instead. Hub one-click uses the same npm package.
+- Install from this repository's tarball: `dsh plugin --profile web|desktop add https://github.com/sonyerving/dsh-purge-plus/archive/refs/heads/main.tar.gz`. From a clone, `add .`. `dsh-purge` is not on npm — the bare package name returns 404. Manual install: see [Install](#install).
 
 ---
 
