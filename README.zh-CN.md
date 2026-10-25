@@ -4,7 +4,7 @@
 
 <h1 align="center">⚔️ DeepSeek Harness 网络安全红队工具（dsh-purge）</h1>
 
-<p align="center"><strong>Version 1.4.5 · 本分支 fork</strong> · 适配 DSH <strong>0.2.1-rc.2</strong></p>
+<p align="center"><strong>Version 1.4.6 · 本分支 fork</strong> · 适配 DSH <strong>0.2.1-rc.3</strong></p>
 
 > **这是 fork，不是上游。** 原项目：[YuJunZhiXue/dsh-purge](https://github.com/YuJunZhiXue/dsh-purge)，原作者 **小杨**（[@YuJunZhiXue](https://github.com/YuJunZhiXue)），MIT 许可证（`Copyright (c) 2026 小杨`，本仓库原样保留）。
 > 本仓库 fork 自 **[@JeffKeeping](https://github.com/JeffKeeping)** 的 [JeffKeeping/dsh-purge-plus](https://github.com/JeffKeeping/dsh-purge-plus)—— **0.2.1-rc.2 适配、破甲内核 v3、设置页重做** 由那边完成；本仓库由 **[@sonyerving](https://github.com/sonyerving)** 维护，在其基础上继续做版本适配、缺陷修复与发版。不改变插件用途与能力范围。
@@ -15,6 +15,7 @@
 > **1.4.3 恢复「插话发送」**：回滚 1.4.2 里把 prompt() 一律改成 followup 的两个补丁（#85/#86），并新增 #90 真正闩锁 running 态的唤醒，turn 收尾窗口的消息不再滞留。
 > **1.4.4 修两处静默失效**：`hostFs` 补上 fd 型同步方法（否则 `.bak` 备份一个都建不出、CLI shim 被误报 `binary`），`repairOfficialCliAfterUnpack` 补 `await`（否则未处理拒绝直接终止宿主）。
 > **1.4.5 建好发版链路**：推送 `main` 自动建 Release 并附 zip；`package.json` 的仓库地址与安装地址改指本分支，不再指向上游；清理文档里的版本漂移。补丁表仍是 80 条，宿主行为不变。
+> **1.4.6 适配 DSH 0.2.1-rc.3**：**零锚点漂移**——80 条补丁在 rc.3 上逐条状态与 rc.2 完全一致（唯一变了的补丁目标文件 `dsh-llm-deepseek/lib/index.js` 仍然命中 #69/#72，桌面壳只差三行），所以本版只改 `dshTarget` 与自检工具：`scripts/compat-check.mjs` 现在连桌面壳补丁（#45/#46/#82/#83/#84）一起验，不再一律报 missing。明细见 [docs/compat-0.2.1-rc.3.md](docs/compat-0.2.1-rc.3.md)。
 > 变更清单与署名要求见 [NOTICE.md](NOTICE.md)；使用前提、无担保与法律声明见 [DISCLAIMER.md](DISCLAIMER.md)。
 > 上游的**非商用**条款沿用：禁止商业售卖、付费倒卖与黑灰产牟利。
 
@@ -27,7 +28,7 @@
   <a href="https://github.com/YuJunZhiXue/dsh-purge/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-65a30d?style=flat" alt="MIT license"></a>
   <a href="https://awesome-dsh-plugin.com"><img src="https://awesome-dsh-plugin.com/badge.svg" alt="awesome · DSH plugin"></a>
   <a href="https://deepseek.stream/plugins/dsh-purge"><img src="https://img.shields.io/badge/Hub-dsh--purge-1a73e8" alt="DeepSeek Harness Hub"></a>
-  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.2.1--rc.2-blue" alt="DSH"></a>
+  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.2.1--rc.3-blue" alt="DSH"></a>
   <br>
   <img src="https://img.shields.io/badge/Node.js-%3E%3D18-339933?logo=node.js&logoColor=fff" alt="Node.js">
   <img src="https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000" alt="JavaScript">
@@ -41,9 +42,9 @@
   <a href="README.md">English</a> | <a href="README.zh-CN.md">中文</a>
 </p>
 
-> **上游维护状态。** 原作者因工作安排暂停更新上游（不再发版、暂不收 issue / PR）。本分支只为「官方 0.2.1-rc.2 能装上、界面能用」而维护，不承诺长期跟进；上游恢复后请优先回到上游。
+> **上游维护状态。** 原作者因工作安排暂停更新上游（不再发版、暂不收 issue / PR）。本分支只为「官方 0.2.1-rc.3 能装上、界面能用」而维护，不承诺长期跟进；上游恢复后请优先回到上游。
 
-> **官方 Web 和官方桌面端都支持。** 官方 `dsh web` 用 profile `web`；官方桌面 EXE（DeepSeek Harness **0.2.1-rc.2**）用 profile `desktop`。两边分开安装、分开点「应用」。当前版本适配 dsh 0.2（含 0.2.1-rc.2）；更早的 dsh 用对应的老版本插件。社区桌面端不维护。
+> **官方 Web 和官方桌面端都支持。** 官方 `dsh web` 用 profile `web`；官方桌面 EXE（DeepSeek Harness **0.2.1-rc.3**）用 profile `desktop`。两边分开安装、分开点「应用」。当前版本适配 dsh 0.2（含 0.2.1-rc.3）；更早的 dsh 用对应的老版本插件。社区桌面端不维护。
 >
 > 写进 profile 还不会改宿主。打开 **设置 → Purge** → **应用**。成功会自动重启；补丁没打完不重启。重启后新开一轮对话，注入才进当前会话。
 >
@@ -174,7 +175,7 @@ Harness 不只是把问题交给模型。它还会在运行时改提示词、审
 
 最新版只支持 **dsh 0.2**，不要拿它去打 0.1.x。
 
-- **dsh 0.2**（官方桌面 **0.2.1-rc.2** / 0.2.0-rc.2 / 官方 `dsh web`）：用 **1.2.0** 及以上。本页命令装的就是这一档。
+- **dsh 0.2**（官方桌面 **0.2.1-rc.3** / 0.2.1-rc.2 / 0.2.0-rc.2 / 官方 `dsh web`）：用 **1.2.0** 及以上；**1.4.6** 是实测对 0.2.1-rc.3 的那一版。本页命令装的就是这一档。
 - **dsh 0.1.7**（含 rc.1 / rc.2）：用 **1.1.39** 及更早 —— 在 [Releases](https://github.com/YuJunZhiXue/dsh-purge/releases) 里选对应标签。
 
 对不上的补丁会显示待应用或跳过，不会乱改文件。
@@ -204,7 +205,7 @@ dsh plugin --profile desktop add dsh-purge
 桌面客户端也可以点按钮（`dsh://` 唤起）：
 
 <p align="center">
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.4.5&repo=sonyerving%2Fdsh-purge-plus&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2Fsonyerving%2Fdsh-purge-plus%2Farchive%2Frefs%2Fheads%2Fmain.tar.gz"><strong>唤起客户端一键安装</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.4.6&repo=sonyerving%2Fdsh-purge-plus&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2Fsonyerving%2Fdsh-purge-plus%2Farchive%2Frefs%2Fheads%2Fmain.tar.gz"><strong>唤起客户端一键安装</strong></a>
 </p>
 
 ### 装完都要做这三步

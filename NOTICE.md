@@ -12,7 +12,7 @@ This repository is a **fork** of **[YuJunZhiXue/dsh-purge](https://github.com/Yu
 | 上游许可证 | MIT，`Copyright (c) 2026 小杨`（见 [LICENSE](LICENSE)，本分支原样保留） |
 | 中间分支 | [JeffKeeping/dsh-purge-plus](https://github.com/JeffKeeping/dsh-purge-plus)：完成 0.2.1-rc.2 适配、破甲内核 v3、设置页重做 |
 | 本仓库 | **sonyerving/dsh-purge-plus**：fork 自上一行，继续做版本适配、缺陷修复与发版 |
-| 本分支版本 | 1.4.5，`dshTarget: 0.2.1-rc.2` |
+| 本分支版本 | 1.4.6，`dshTarget: 0.2.1-rc.3` |
 
 上游 README 要求：**借用本项目的名称、思路、代码或提示词，必须署名并写明来源仓库**。本仓库保留原作者署名、上游链接与原始 MIT 许可证文本；这是使用条件，不是可选项。
 
@@ -24,7 +24,13 @@ The upstream project requires attribution and a link back to its repository when
 
 只改「适配新版 + 界面 + 一处补丁锚点」，不改变插件的用途与能力范围。
 
-**适配 DSH 0.2.1-rc.2**
+**适配 DSH 0.2.1-rc.3（1.4.6）**
+
+- 实测**零锚点漂移**：80 条补丁在 rc.3 官方桌面构建上 `applied 63 / already 8 / missing_file 7 / skipped 2 / pending 0`，二、三次 apply 都是 `applied 0`；同一份包集下逐条状态与 rc.2 对照树完全一致。rc.3 的补丁目标包里只有一个文件真变了（`dsh-llm-deepseek/lib/index.js`，新增 `/models` 列表），桌面壳 `lib/main.js` 与 rc.2 只差三处（首行空行、版本字符串、末尾换行）。
+- `scripts/compat-check.mjs` 补上**桌面壳校验**：临时树按桌面安装形态搭建（`DeepSeek Harness.exe` + `resources/app/lib/main.js` + `resources/app/dsh/node_modules/…`），#45 / #46 / #82 / #83 / #84 不再一律记成 `missing_file`；新增 `--keep` 保留现场。
+- 适配报告：[docs/compat-0.2.1-rc.3.md](docs/compat-0.2.1-rc.3.md)。
+
+**适配 DSH 0.2.1-rc.2（1.2.0 / 1.3.x，由中间分支完成）**
 
 - `dshTarget` 提到 `0.2.1-rc.2`；补网页版提示词迁移到新包 `dsh-harness-dev-context` 后的锚点（#32 / #53），补齐回退标记锚点（#77）。
 - 新增 `scripts/compat-check.mjs`：直接从封着的 `app.asar` 或解开的 `app/` 取补丁目标文件跑全量引擎，输出每条补丁状态，退出码可进 CI。
@@ -50,7 +56,7 @@ The upstream project requires attribution and a link back to its repository when
 - `#40 COMPLETE_PROMPT_KEEP_INJECT` 在 0.2.1 上原来一条 pattern 都不命中：0.2.1 在 `return transformed;` 与 `return {…}` 之间多插了一行 `const requiredContexts = new Set(…)`。状态是 `skipped` 不算失败，但重启前的校验仍能看到 `sections: … : [completeSection]`，于是判定「没洗过」并拒绝重启——表现为点「应用」后提示「清洗没有写进全部宿主，已取消重启」。
 - 拆成两条只认关键行的替换后，该补丁在 0.2.1 原树上直接 `applied`。
 
-完整变更见 [CHANGELOG.md](CHANGELOG.md) 与 [docs/compat-0.2.1.md](docs/compat-0.2.1.md)。
+完整变更见 [CHANGELOG.md](CHANGELOG.md) 与 [docs/compat-0.2.1-rc.3.md](docs/compat-0.2.1-rc.3.md)、[docs/compat-0.2.1.md](docs/compat-0.2.1.md)。
 
 ### 1.4.0 的借鉴来源 / What 1.4.0 borrows
 

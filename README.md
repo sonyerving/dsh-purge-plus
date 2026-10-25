@@ -4,7 +4,7 @@
 
 <h1 align="center">⚔️ DeepSeek Harness cybersecurity red-team tool (dsh-purge)</h1>
 
-<p align="center"><strong>Version 1.4.5 · fork</strong> · targets DSH <strong>0.2.1-rc.2</strong></p>
+<p align="center"><strong>Version 1.4.6 · fork</strong> · targets DSH <strong>0.2.1-rc.3</strong></p>
 
 > **This is a fork, not upstream.** Original project: [YuJunZhiXue/dsh-purge](https://github.com/YuJunZhiXue/dsh-purge) by **小杨** ([@YuJunZhiXue](https://github.com/YuJunZhiXue)), MIT licence (`Copyright (c) 2026 小杨`, kept verbatim here).
 > This repository is forked from **[@JeffKeeping](https://github.com/JeffKeeping)**'s [JeffKeeping/dsh-purge-plus](https://github.com/JeffKeeping/dsh-purge-plus) — the **0.2.1-rc.2 compatibility work, prompt kernel v3, and the rebuilt settings UI** come from there. This copy is maintained by **[@sonyerving](https://github.com/sonyerving)**, which continues version compatibility, bug fixes, and releases on top of it. It does not change what the plugin does.
@@ -15,6 +15,7 @@
 > **1.4.3 restores steer delivery**: reverts the two 1.4.2 patches that forced every prompt to followup (#85/#86) and adds #90, which latches wakes during the running phase so turn-tail messages are no longer stranded.
 > **1.4.4 fixes two silent failures**: `hostFs` now exposes the fd-based sync methods (without them no `.bak` backup could be created and CLI shims were misreported as `binary`), and `repairOfficialCliAfterUnpack` now awaits (an unhandled rejection used to terminate the host).
 > **1.4.5 wires up publishing**: pushing `main` now creates a GitHub Release with a zip; the repository and install URLs in `package.json` point at this fork instead of upstream; stale version references in the docs were cleaned up. The patch table is still 80 entries and host behaviour is unchanged.
+> **1.4.6 targets DSH 0.2.1-rc.3**: no pattern had to change — all 80 patches settle identically on rc.3 (the only target file that differs, `dsh-llm-deepseek/lib/index.js`, keeps the #69/#72 anchors, and the desktop shell differs by three lines). `scripts/compat-check.mjs` now also verifies the desktop-shell patches (#45/#46/#82/#83/#84) instead of reporting them as missing. Details: [docs/compat-0.2.1-rc.3.md](docs/compat-0.2.1-rc.3.md).
 > Changes and attribution: [NOTICE.md](NOTICE.md). Preconditions, no-warranty and legal terms: [DISCLAIMER.md](DISCLAIMER.md).
 > The upstream **non-commercial** term carries over: no paid resale, no gray- or black-market profit.
 
@@ -27,7 +28,7 @@
   <a href="https://github.com/YuJunZhiXue/dsh-purge/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-65a30d?style=flat" alt="MIT license"></a>
   <a href="https://awesome-dsh-plugin.com"><img src="https://awesome-dsh-plugin.com/badge.svg" alt="awesome · DSH plugin"></a>
   <a href="https://deepseek.stream/plugins/dsh-purge"><img src="https://img.shields.io/badge/Hub-dsh--purge-1a73e8" alt="DeepSeek Harness Hub"></a>
-  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.2.1--rc.2-blue" alt="DSH"></a>
+  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.2.1--rc.3-blue" alt="DSH"></a>
   <br>
   <img src="https://img.shields.io/badge/Node.js-%3E%3D18-339933?logo=node.js&logoColor=fff" alt="Node.js">
   <img src="https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000" alt="JavaScript">
@@ -41,9 +42,9 @@
   <a href="README.md">English</a> | <a href="README.zh-CN.md">中文</a>
 </p>
 
-> **Upstream status.** The original author has paused upstream development (no new releases, issues / PRs not taken). This fork is maintained only so the official 0.2.1-rc.2 build installs and its UI works; no long-term tracking is promised. When upstream resumes, prefer it.
+> **Upstream status.** The original author has paused upstream development (no new releases, issues / PRs not taken). This fork is maintained only so the official 0.2.1-rc.3 build installs and its UI works; no long-term tracking is promised. When upstream resumes, prefer it.
 
-> **Official Web and the official desktop app are both supported.** Official `dsh web` uses profile `web`. The official desktop EXE (DeepSeek Harness **0.2.1-rc.2**) uses profile `desktop`. Install and Apply them separately. This release targets dsh 0.2, including 0.2.1-rc.2. Older dsh builds need the matching older plugin. Community Desktop is not maintained.
+> **Official Web and the official desktop app are both supported.** Official `dsh web` uses profile `web`. The official desktop EXE (DeepSeek Harness **0.2.1-rc.3**) uses profile `desktop`. Install and Apply them separately. This release targets dsh 0.2, including 0.2.1-rc.3. Older dsh builds need the matching older plugin. Community Desktop is not maintained.
 >
 > Adding the plugin to a profile does not patch the host. Open **Settings → Purge** → **Apply**. A successful Apply restarts; an unfinished Apply does not. After the restart, start a new chat - that is when the inject enters the session.
 >
@@ -174,7 +175,7 @@ WeChat name **「老张的ai科技」**, same handle as the live-room viewer boa
 
 The latest plugin supports **dsh 0.2** only — do not apply it to 0.1.x.
 
-- **dsh 0.2** (official desktop **0.2.1-rc.2** / 0.2.0-rc.2 / official `dsh web`): use **1.2.0** or newer. This page installs that line.
+- **dsh 0.2** (official desktop **0.2.1-rc.3** / 0.2.1-rc.2 / 0.2.0-rc.2 / official `dsh web`): use **1.2.0** or newer; **1.4.6** is the release measured against 0.2.1-rc.3. This page installs that line.
 - **dsh 0.1.7** (incl. rc.1 / rc.2): use **1.1.39** or older — pick the tag on [Releases](https://github.com/YuJunZhiXue/dsh-purge/releases).
 
 Unmatched patches stay pending or skipped; nothing is rewritten blindly.
@@ -204,7 +205,7 @@ Hub one-click on [dsh-plugin.org](https://dsh-plugin.org/plugins/yujunzhixue/dsh
 For the desktop client you can also click the button (`dsh://` deep link):
 
 <p align="center">
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.4.5&repo=sonyerving%2Fdsh-purge-plus&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2Fsonyerving%2Fdsh-purge-plus%2Farchive%2Frefs%2Fheads%2Fmain.tar.gz"><strong>Install in desktop client</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.4.6&repo=sonyerving%2Fdsh-purge-plus&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2Fsonyerving%2Fdsh-purge-plus%2Farchive%2Frefs%2Fheads%2Fmain.tar.gz"><strong>Install in desktop client</strong></a>
 </p>
 
 ### After the command: three steps
