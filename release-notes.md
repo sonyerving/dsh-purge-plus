@@ -1,21 +1,27 @@
-# 1.4.6
+# 1.4.7
 
 ## 中文
 
-- 版本 **1.4.6**，`dshTarget` 提到 **0.2.1-rc.3**。**补丁表一条没改**：80 条在 rc.3 官方桌面构建上实测 `63 applied / 8 already / 7 missing_file / 2 skipped / 0 pending`，二、三次 apply 都是 `applied 0`；同一份包集下逐条状态与 rc.2 对照树完全一致（80/80）。
-- **为什么不用改**：rc.3 的补丁目标包里只有一个文件真变了（`dsh-llm-deepseek/lib/index.js`，新增 `/models` 列表与模型目录闸门；#69 / #72 锚点仍在）；桌面壳 `lib/main.js` 与 rc.2 只差三处（首行空行、版本字符串、末尾换行）；其余目标包逐字节未变。
-- **`compat-check` 现在也验桌面壳**：以前壳入口落在临时目录之外，#45 / #46 / #82 / #83 / #84 永远记成 `missing_file`，「壳锚点在 rc.3 上还成不成立」从没被验证过。现在临时树自带 `DeepSeek Harness.exe` 与 `resources/app/lib/main.js`，`--surface desktop` 一跑就能看出壳补丁有没有漂；新增 `--keep` 保留临时树排查。
-- **新文档** [`docs/compat-0.2.1-rc.3.md`](docs/compat-0.2.1-rc.3.md)：rc.2 → rc.3 的漂移明细（含 19 个变动文件为什么都不影响补丁）、实测数据表、从安装包 `.exe` 里取 `app.asar` 的命令。
-- **rc.3 新增功能与补丁表的关系**：View 标签钉选、草稿 `whenDraftExists` / `appendDraft`、`GET /models` 都不需要新补丁；本插件用的三处 slot（`settings.section` / `shell.overlay` / `conversation.input.right`）在 rc.3 里都还在。
-- **观察项（本版未处理）**：rc.3 扩充了产品遥测（`agent_preset_switch`、`send_button_click.is_new_session`、`more_menu_item_click`、`code_work_view_toggle`）。补丁表从 1.1.x 起就不动 `dsh-client-product-analytics`，这次沿用，只记在适配报告里——关遥测是另一件事，不混进版本适配。
-- 装法不变：装上插件后在 **设置 → Purge → 应用**，再重启宿主；rc.3 上不需要重装或换配置。
+- 版本 **1.4.7**。`dshTarget` 仍是 `0.2.1-rc.3`，**补丁表一条没动**（80 条，零锚点漂移）；这一版修的是**更新目标和文档**。
+- **修更新目标（重要）**：插件内「更新 / 切换到正式版」原来写死上游 `YuJunZhiXue/dsh-purge` 的 `master`，在本 fork 上点更新会把**上游**装进来，等于把 rc.3 适配覆盖掉。现在仓库与分支从 `package.json` 推导（本仓库 `sonyerving/dsh-purge-plus` 的 `main`），旧客户端 / 旧 pin 里的 `master` 自动映射到 `main`，不会硬失败。
+- **修安装说明**：`dsh-purge` **没有发布到 npm**（`registry.npmjs.org/dsh-purge` 404），而 `dsh plugin … add` 只是把参数转给 pnpm。README 原来主推的 `dsh plugin --profile web|desktop add dsh-purge` 必然失败，现在统一改成 tarball：`…/sonyerving/dsh-purge-plus/archive/refs/heads/main.tar.gz`，`add .` 保留。
+- **删掉已删除功能的描述**：`/rewind` 与「回退一次 / 回退上一轮」整段（1.4.2 就删了，README 却还在教），本地校验里的 `lib/rewind.js`。
+- **修默认值描述**：`autoApplyOnStart` 实际默认 **false**（启动只对齐状态戳，不写宿主），README 表格与 YAML 示例都写成 `true`，已改正。
+- **导航名与预览标题**：设置导航行是 **Purge**（不是「破甲」，「破甲」是页内第一段）；预览小标题「清洗（浮窗）/ Clean (dock)」改成「设置页·破甲段」。
+- **过期建议**：「请升到 1.1.61+」→「1.4.6 及以上」；`master.tar.gz` → `main.tar.gz`。
+- **上游状态与许可口径**（按事实修正）：上游已恢复维护（2026-10-24 发布 v1.1.78，之后仍有提交），README 改成「上游已恢复 + 本分支只做 rc 适配 / 缺陷修复 / 自己的发版」；本仓库 `LICENSE` 是 fork 时继承的 MIT 原文（未改），上游当前标注 **Apache-2.0**，两边不一致——NOTICE 与 DISCLAIMER 补上说明，LICENSE 原文不动。
+- **修 `compat-check` 的只读性**：旧版会把命令行里的 `--app …/resources/app` 当成当前安装（core 的宿主定位会扫 argv），桌面壳补丁直接写回被检查的那个目录。现在解析完参数就摸掉 argv，壳入口只走临时树，被检查的安装不会被改写。
+- 清理：删掉没有任何引用的 `docs/preview/settings.png`。安装方式与补丁行为不变；`/purge`、`/rules`、`/skills` 命令和四个面板分段照旧。
 
 ## English
 
-- Version **1.4.6**, `dshTarget` bumped to **0.2.1-rc.3**. The patch table is unchanged: all 80 entries measure `63 applied / 8 already / 7 missing_file / 2 skipped / 0 pending` on the official rc.3 desktop build, a second and third apply report `applied 0`, and per-patch statuses are identical (80/80) to the rc.2 control tree over the same package set.
-- **Why nothing had to change**: exactly one patch-target file differs in rc.3 — `dsh-llm-deepseek/lib/index.js` (new `/models` listing and catalog gate; the #69 / #72 anchors are still in place). The desktop shell `lib/main.js` differs from rc.2 in three places only (leading blank line, version string, trailing newline), and every other target package is byte-identical.
-- **`compat-check` now covers the desktop shell too**: previously the shell entry lived outside the temp tree, so #45 / #46 / #82 / #83 / #84 were always reported as `missing_file` and nobody ever verified whether the shell anchors survived a version bump. The temp tree now contains `DeepSeek Harness.exe` and `resources/app/lib/main.js`, so `--surface desktop` proves the shell patches settle, and `--keep` preserves the tree for debugging.
-- **New report** [`docs/compat-0.2.1-rc.3.md`](docs/compat-0.2.1-rc.3.md): rc.2 → rc.3 drift details (including why the 19 changed files cannot affect the table), measured numbers, and the command to pull `app.asar` out of the installer `.exe`.
-- **rc.3 features versus the table**: View tab pinning, the draft `whenDraftExists` / `appendDraft` API and `GET /models` need no new patches; all three slots this plugin uses (`settings.section`, `shell.overlay`, `conversation.input.right`) still exist in rc.3.
-- **Observation, not handled here**: rc.3 expanded product analytics (`agent_preset_switch`, `send_button_click.is_new_session`, `more_menu_item_click`, `code_work_view_toggle`). The table has never touched `dsh-client-product-analytics`; that stays as-is and is recorded in the compat report only — turning telemetry off is a separate change, not part of a version bump.
-- Install path unchanged: apply in **Settings → Purge**, then restart the host. No reinstall or config change is needed on rc.3.
+- Version **1.4.7**. `dshTarget` stays at `0.2.1-rc.3` and the patch table is **untouched** (80 entries, zero anchor drift); this release fixes the **updater target and the docs**.
+- **Updater target (important)**: the in-plugin "Update / Switch to stable" was hard-coded to upstream `YuJunZhiXue/dsh-purge` on `master`, so on this fork it installed **upstream** over the rc.3 work. The repo and branch are now derived from `package.json` (this fork's `main`), and the legacy `master` in old clients / stored pins maps to `main` instead of failing.
+- **Install instructions**: `dsh-purge` is **not published to npm** (`registry.npmjs.org/dsh-purge` returns 404) and `dsh plugin … add` only forwards arguments to pnpm, so the previously documented `add dsh-purge` could never work. Both READMEs now use the tarball URL (`…/sonyerving/dsh-purge-plus/archive/refs/heads/main.tar.gz`); `add .` still works from a clone.
+- **Removed docs for removed features**: the `/rewind` command and the whole "Undo once / Undo last round" paragraph (gone since 1.4.2), plus `lib/rewind.js` in the local-checks list.
+- **Corrected defaults**: `autoApplyOnStart` really defaults to **false** (startup only aligns the stamp, it does not write the host); the table row and the YAML sample said `true`.
+- **Naming**: the settings rail row is **Purge** (not 破甲, which is the first segment inside the page); the preview heading "Clean (dock)" now reads "Armor segment".
+- **Stale advice**: "use 1.1.61+" → "1.4.6 or newer"; `master.tar.gz` → `main.tar.gz`.
+- **Upstream status and licence wording** (factual): upstream is maintained again (v1.1.78 on 2026-10-24, commits after), so the README now states that plus where this fork stands (rc compatibility, verified fixes, own releases). The repository `LICENSE` remains the MIT text inherited at fork time; upstream currently declares **Apache-2.0** — NOTICE and DISCLAIMER now say so explicitly and the licence text is left untouched.
+- **`compat-check` is actually read-only now**: it used to let core's host discovery (which scans argv) treat `--app …/resources/app` as the live install, so desktop-shell patches were written back into the directory under test. Argv is stripped after parsing and the shell entry only ever comes from the temp tree, so the inspected installation is never modified.
+- Cleanup: dropped the unreferenced `docs/preview/settings.png`. Install flow and patch behaviour are unchanged; `/purge`, `/rules`, `/skills` and the four panel segments stay as they were.

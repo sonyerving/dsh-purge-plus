@@ -88,6 +88,8 @@ node scripts/compat-check.mjs --asar <path> --json report.json --keep
 
 退出码：0 = 没有 pending；1 = 还有 pending（说明这一版 dsh 又改了锚点）；2 = 参数或目录不对。
 
+要检查的安装**不会被改写**：脚本解析完参数就把 argv 抹掉（否则 core 的宿主定位会把 `--app …/resources/app` 当成当前安装，桌面壳补丁直接写回被检查的目录），壳入口只从临时树取。验证办法：跑完对比 `lib/main.js` 的 sha256 不变。
+
 从 `.exe` 里取 `app.asar`（本机实测可用）：
 
 ```bash

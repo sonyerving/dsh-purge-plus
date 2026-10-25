@@ -7,6 +7,51 @@ Baseline: **1.2.0**. Everything below is what this fork adds, improves, or fixes
 
 ---
 
+## 1.4.7 — 修更新目标（不再装回上游）+ 文档对齐事实
+
+### 问题（最严重的一条）
+
+`lib/update.js` 里两个常量写死了上游：`REPO = "YuJunZhiXue/dsh-purge"`、`STABLE_REF = "master"`。本仓库是 `sonyerving/dsh-purge-plus`，只有 `main` 分支。
+后果：面板里点「更新 / 切换到正式版」→ 拉上游的 `master` → **把上游代码装到本 fork 上**，rc.3 适配被覆盖；而此时 README 还写着「就装回 master」。
+
+### 修法
+
+- `REPO` 从 `package.json` 的 `dsh.install.git`（回退 `repository.url`）推导，读不到才用常量 `sonyerving/dsh-purge-plus`；`STABLE_REF = "main"`。
+- `safeUpdateRef()` 做别名归一：旧客户端 / 旧 pin 里的 `master` → `main`。这是所有写盘路径的唯一漏斗（`gitResetTo` / `overlayFromZip` / `switchVersion` / `handleUpdateOp` 都过它），所以不必给老客户端发新版也能用。
+- `markCurrent` / `ensureRunningVersion` 里比较 `item.ref === "master"` 的地方改成 `STABLE_REF`；远端读不到时的报错改成带上仓库与分支名。
+- 新增 `updateRepo()` 小导出，便于自检。
+- **`compat-check` 真的只读了**：以前 `--app …/resources/app` 会被 core 的宿主定位（它会扫 argv）当成当前安装，桌面壳补丁直接写回你传进来的那个目录——自测时就把 rc.2 夹具的 `lib/main.js` 打脏了。现在参数解析完就把 argv 抹掉，壳入口一律走临时树；跑完对比夹具 sha256 不变。
+
+### 文档（逐条对应实测）
+
+| 问题 | 证据 | 改法 |
+| --- | --- | --- |
+| 主推 `dsh plugin … add dsh-purge` | `dsh plugin --help` 是 pnpm 透传；`registry.npmjs.org/dsh-purge` 404 | 中英 README 主命令换成 tarball URL，并说明为何不能写包名 |
+| 「插件市场按本仓库反查 npm」 | 同上；市场页是上游条目 | 改成「那是上游页，装本分支用 tarball / `dsh://`」 |
+| `master.tar.gz` | 本仓库只有 `main` | 改 `main.tar.gz` |
+| `/rewind` + 回退按钮整段 | 1.4.2 已删；`lib/`、`bin/` 里 0 命中 | 删两处；本地校验去掉 `lib/rewind.js`，换 `lib/reapply.js` + `compat-check` |
+| `autoApplyOnStart: true` / 「启动时自动应用」 | `cordis.patch.yml` 与 `lib/index.js:53` 默认 false；`index.js:935` 只对齐状态戳 | 示例改 false，说明改成「启动只对齐，改宿主要点应用」 |
+| 导航写「破甲」 | `client.js` 的 `page.nav` 是 `Purge` | 改为 Purge |
+| 「清洗（浮窗）/ Clean (dock)」 | 1.3.0 起无浮窗 | 改「设置页·破甲段 / Armor segment」 |
+| 「请升到 1.1.61+」 | 现为 1.4.x | 改 1.4.6 及以上 |
+| 「上游暂停更新」 | 上游 2026-10-24 发 v1.1.78，之后仍有提交 | 改成「上游已恢复 + 本分支定位」 |
+| 许可口径写死 MIT | 上游当前标注 Apache-2.0，本仓库 `LICENSE` 是继承的 MIT 原文 | 只改措辞（NOTICE / DISCLAIMER / README），`LICENSE` 原文不动 |
+| `docs/preview/settings.png` 无引用 | 全仓库 0 引用 | 删除 |
+
+### 验证
+
+- `node --check lib/update.js`；`updateRepo()` 返回 `sonyerving/dsh-purge-plus`；`safeUpdateRef` 单测：`master→main`、`main→main`、`beta→beta`、`v1.4.6→v1.4.6`、`./etc→""`。
+- `node test/gate.mjs` 71 passed；`node test/hostfs-sync.mjs` 20 passed；`node --check` 源码入口 + `import('./lib/index.js')` 通过。
+- `node scripts/compat-check.mjs --asar <0.2.1-rc.3 官方 app.asar> --surface desktop` → `{"applied":63,"already":8,"missing_file":7,"skipped":2}`，exit 0（补丁表未动）。
+- 内部链接 / 锚点重扫：0 断链。
+
+### 未处理
+
+- 测试版通道指向 `beta` 分支，本仓库没有该分支，所以面板只显示正式版；没有伪造一个 beta 分支。
+- 这次没动 `client.js`（它发出去的 `master` 由服务端别名吃掉），避免重建前端产物。
+
+---
+
 ## 1.4.6 — 适配 DSH 0.2.1-rc.3（补丁表零漂移）
 
 ### 结论先说
