@@ -32,3 +32,6 @@ default-prompt-inject.md
 /official-harness-payload.7z
 *.asar
 *.asar.bak
+
+# dsh-ops 工具产生的临时锁，别提交
+.dsh-ops-update-*.lock
