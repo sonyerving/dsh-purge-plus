@@ -10,8 +10,9 @@ This repository is a **fork** of **[YuJunZhiXue/dsh-purge](https://github.com/Yu
 | 原作者 | **小杨**（GitHub: [@YuJunZhiXue](https://github.com/YuJunZhiXue)） |
 | 上游仓库 | https://github.com/YuJunZhiXue/dsh-purge |
 | 上游许可证 | MIT，`Copyright (c) 2026 小杨`（见 [LICENSE](LICENSE)，本分支原样保留） |
-| 本分支 | 由 **JeffKeeping** 维护，仅做版本适配与体验优化 |
-| 本分支版本 | 1.3.1，`dshTarget: 0.2.1-rc.2` |
+| 中间分支 | [JeffKeeping/dsh-purge-plus](https://github.com/JeffKeeping/dsh-purge-plus)：完成 0.2.1-rc.2 适配、破甲内核 v3、设置页重做 |
+| 本仓库 | **sonyerving/dsh-purge-plus**：fork 自上一行，继续做版本适配、缺陷修复与发版 |
+| 本分支版本 | 1.4.5，`dshTarget: 0.2.1-rc.2` |
 
 上游 README 要求：**借用本项目的名称、思路、代码或提示词，必须署名并写明来源仓库**。本仓库保留原作者署名、上游链接与原始 MIT 许可证文本；这是使用条件，不是可选项。
 

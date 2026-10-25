@@ -4,16 +4,17 @@
 
 <h1 align="center">⚔️ DeepSeek Harness 网络安全红队工具（dsh-purge）</h1>
 
-<p align="center"><strong>Version 1.4.4 · 本分支 fork</strong> · 适配 DSH <strong>0.2.1-rc.2</strong></p>
+<p align="center"><strong>Version 1.4.5 · 本分支 fork</strong> · 适配 DSH <strong>0.2.1-rc.2</strong></p>
 
 > **这是 fork，不是上游。** 原项目：[YuJunZhiXue/dsh-purge](https://github.com/YuJunZhiXue/dsh-purge)，原作者 **小杨**（[@YuJunZhiXue](https://github.com/YuJunZhiXue)），MIT 许可证（`Copyright (c) 2026 小杨`，本仓库原样保留）。
-> 本分支由 **[@JeffKeeping](https://github.com/JeffKeeping)** 维护，只做 **0.2.1-rc.2 适配 + 破甲内核升级 + 界面重做 + 一处补丁锚点修复**，不改变插件用途与能力范围。
+> 本仓库 fork 自 **[@JeffKeeping](https://github.com/JeffKeeping)** 的 [JeffKeeping/dsh-purge-plus](https://github.com/JeffKeeping/dsh-purge-plus)—— **0.2.1-rc.2 适配、破甲内核 v3、设置页重做** 由那边完成；本仓库由 **[@sonyerving](https://github.com/sonyerving)** 维护，在其基础上继续做版本适配、缺陷修复与发版。不改变插件用途与能力范围。
 > 逐条对比上一版（1.2.0）优化与新增了什么：**[CHANGELOG.md](CHANGELOG.md)**。
 > 1.4.0 的审批档位 / 审计流水 / 严格 JSON / 修订号借鉴了 [Minglink/dsh-infinite-gen-5](https://github.com/Minglink/dsh-infinite-gen-5)，来源与边界见 [NOTICE.md](NOTICE.md)。
 > **1.4.1 修掉「装完就报 unknown prompt variable {{cwd}}」**：0.2.1 只注册 provider / model，本插件已补注册 cwd 并不再让配置发变量。
 > **1.4.2 移除输入框的「回退」按钮及其作用**（后端路由、`/rewind` 命令、3 条补丁一起删），补丁总数 82 → 79。
 > **1.4.3 恢复「插话发送」**：回滚 1.4.2 里把 prompt() 一律改成 followup 的两个补丁（#85/#86），并新增 #90 真正闩锁 running 态的唤醒，turn 收尾窗口的消息不再滞留。
 > **1.4.4 修两处静默失效**：`hostFs` 补上 fd 型同步方法（否则 `.bak` 备份一个都建不出、CLI shim 被误报 `binary`），`repairOfficialCliAfterUnpack` 补 `await`（否则未处理拒绝直接终止宿主）。
+> **1.4.5 建好发版链路**：推送 `main` 自动建 Release 并附 zip；`package.json` 的仓库地址与安装地址改指本分支，不再指向上游；清理文档里的版本漂移。补丁表仍是 80 条，宿主行为不变。
 > 变更清单与署名要求见 [NOTICE.md](NOTICE.md)；使用前提、无担保与法律声明见 [DISCLAIMER.md](DISCLAIMER.md)。
 > 上游的**非商用**条款沿用：禁止商业售卖、付费倒卖与黑灰产牟利。
 
@@ -196,14 +197,14 @@ dsh plugin --profile web add dsh-purge
 dsh plugin --profile desktop add dsh-purge
 ```
 
-当前目录已经是本仓库时，把包名换成 `add .`。`dsh` 不在 PATH 时走 [手动安装](#manual)。registry 上不去：同一个 `--profile`，把目标换成 `https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz`。
+当前目录已经是本仓库时，把包名换成 `add .`。`dsh` 不在 PATH 时走 [手动安装](#manual)。registry 上不去：同一个 `--profile`，把目标换成 `https://github.com/sonyerving/dsh-purge-plus/archive/refs/heads/main.tar.gz`。
 
 [插件市场](https://dsh-plugin.org/plugins/yujunzhixue/dsh-purge) 一键安装会按本仓库反查 npm，命中后装 `dsh-purge`。目录页可能仍写 `github:` —— 按钮若退回 git，用上表命令。
 
 桌面客户端也可以点按钮（`dsh://` 唤起）：
 
 <p align="center">
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.71&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>唤起客户端一键安装</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.4.5&repo=sonyerving%2Fdsh-purge-plus&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2Fsonyerving%2Fdsh-purge-plus%2Farchive%2Frefs%2Fheads%2Fmain.tar.gz"><strong>唤起客户端一键安装</strong></a>
 </p>
 
 ### 装完都要做这三步
@@ -233,7 +234,7 @@ Web 的控件只动 Web，桌面端的只动桌面应用。不要在一个宿主
 
 安装 DeepSeek Harness 插件 `dsh-purge`，Web 和官方桌面端都要装。不要全盘搜索，不要读或改其它文件，不要应用设置，也不要重启应用。
 
-`dsh` 不在 PATH 就告诉用户后停止。当前目录已是本仓库时，把下面两条里的包名都换成 `.`。npm registry 上不去，把包名换成 `https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz`。某个 profile 不存在就跳过那一条，另一条照装。
+`dsh` 不在 PATH 就告诉用户后停止。当前目录已是本仓库时，把下面两条里的包名都换成 `.`。npm registry 上不去，把包名换成 `https://github.com/sonyerving/dsh-purge-plus/archive/refs/heads/main.tar.gz`。某个 profile 不存在就跳过那一条，另一条照装。
 
 **Web 端（官方 `dsh web`）**
 
@@ -282,10 +283,10 @@ $cands | Select-Object -Unique | Where-Object { $_ -and (Test-Path (Join-Path $_
 **2. 把插件放到 `$DSH_HOME/plugins/dsh-purge`**（目录名必须是 `dsh-purge`，其 `package.json` 里 `"name"` 也必须是 `dsh-purge`）。
 
 ```sh
-git clone https://github.com/YuJunZhiXue/dsh-purge.git "$DSH_HOME/plugins/dsh-purge"
+git clone https://github.com/sonyerving/dsh-purge-plus.git "$DSH_HOME/plugins/dsh-purge"
 ```
 
-没有 git：下载 [master.tar.gz](https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz)，解压后把 `dsh-purge-master` 改名为 `dsh-purge`，整夹放到 `plugins` 下。已有本仓库副本就复制整个目录，不要只拷几个 `.js`。
+没有 git：下载 [main.tar.gz](https://github.com/sonyerving/dsh-purge-plus/archive/refs/heads/main.tar.gz)，解压后把 `dsh-purge-main` 改名为 `dsh-purge`，整夹放到 `plugins` 下。已有本仓库副本就复制整个目录，不要只拷几个 `.js`。
 
 **3. 只改对应 profile 的 `package.json`，先备份。** Web → `$DSH_HOME/profiles/web/package.json`；桌面 → `$DSH_HOME/profiles/desktop/package.json`。**只追加两处**，原有依赖和 bundle 全部留着：
 
@@ -600,7 +601,7 @@ flowchart LR
 
 ## 更新
 
-每一版改了什么、安装包在 [Releases](https://github.com/YuJunZhiXue/dsh-purge/releases)。发新版时把 `package.json` 的版本号改掉，中英文说明写进 `release-notes.md`，推到 `master` 就会自动打包。同一版本再推送不会重复发包。
+每一版改了什么、安装包在 [Releases](https://github.com/sonyerving/dsh-purge-plus/releases)。发新版时把 `package.json` 的版本号改掉（`version` 与 `dsh.version` 两处），中英文说明写进 `release-notes.md` 且首行必须是 `# <版本>`，推到 `main` 就会自动建 Release 并附 zip。同一版本再推送不会重复发包。
 
 ## 说明
 
