@@ -47,6 +47,12 @@ jobs:
             echo "release-notes.md 第一行必须是 # ${version}，现在是: ${first}"
             exit 1
           fi
+          # 只允许当前版本一节：Release 正文就是这个文件，历史请放 docs/release-notes-archive.md
+          headings="$(grep -c '^# ' release-notes.md || true)"
+          if [ "$headings" != "1" ]; then
+            echo "release-notes.md 只应包含当前版本一节，现在有 ${headings} 个一级标题"
+            exit 1
+          fi
           zip="dsh-purge-${version}.zip"
           if git rev-parse -q --verify "refs/tags/${tag}^{}" >/dev/null; then
             commit="$(git rev-parse "refs/tags/${tag}^{}")"
