@@ -7,6 +7,43 @@ Baseline: **1.2.0**. Everything below is what this fork adds, improves, or fixes
 
 ---
 
+## 1.4.5 — 发版链路与元数据对齐（不动补丁表）
+
+这一版不改宿主文件、不动补丁表（仍是 80 条），只把「怎么发版」和「仓库身份」这两件长期脏活收尾。
+
+### 改了什么
+
+| 项 | 之前 | 现在 |
+| --- | --- | --- |
+| CI 触发分支 | `master` | `main`（本仓库默认分支） |
+| CI 仓库条件 | `github.repository == 'YuJunZhiXue/dsh-purge'`（在 fork 上永不成立） | `'sonyerving/dsh-purge-plus'` |
+| 发布物 | 无（fork 从不运行 workflow） | Release + `dsh-purge-<版本>.zip`（`git archive`，前缀 `dsh-purge-<版本>/`） |
+| `package.json` 的 repository/homepage/bugs | 指向上游 | 指向本分支 |
+| `dsh.install` 三个地址 | 上游 `master.tar.gz` / `master.zip` / 上游 git | 本分支 `main.tar.gz` / `main.zip` / 本分支 git |
+| README `dsh://` 一键安装 | `version=1.1.71` + 上游仓库 | `version=1.4.5` + 本仓库 `main.tar.gz` |
+| 版本号一致性 | `NOTICE.md` 写 1.3.1、`release-notes.md` 首行 1.3.1 | 统一 1.4.5（`release-notes.md` 首行改成 `# 1.4.5`，CI 会校验这一行） |
+| 提交方式 | 每版一个快照提交（需 force push） | 常规增量提交 |
+
+### 为什么不改补丁表
+
+1.4.4 刚修完两处静默失效（`HOST_FD` 白名单 + `await`），宿主侧没有新问题；把补丁表与发版机制分开升级，出问题时能直接判定是哪一侧引起的。
+
+### 验证
+
+- `node test/gate.mjs`：ALL PASS（71 项）。
+- `node test/hostfs-sync.mjs`：20 passed / 0 failed。
+- `node scripts/compat-check.mjs --app "<resources>/app" --surface desktop`：`{"already":66,"missing_file":12,"skipped":2}`，退出码 0。
+- `node --check lib/index.js lib/core.js client.js` 通过；`node --input-type=module -e "import('./lib/index.js')"` 通过（CI 同样的四行检查）。
+- `node scripts/build-client.mjs` 重跑后 `client.js` 与仓库版本逐字节一致（演练台片段未漂）。
+
+### 发版注意
+
+- `release-notes.md` 首行必须是 `# <package.json 的 version>`，否则 workflow 直接退出 1。
+- 同一版本重复推送不会重复发包（`gh release view` 命中即跳过）。
+- 预发布版本（含 `beta`/`alpha`/`rc`）会自动标 `--prerelease`。
+
+---
+
 ## 1.4.4 — 修两处静默失效：hostFs 缺 fd 方法、atomicCopyFile 漏 await
 
 两处都是 Windows + 0.2.1-rc.2 上实测出来的，共同特点：**不报错，只是悄悄不工作**。
