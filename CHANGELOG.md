@@ -7,6 +7,55 @@ Baseline: **1.2.0**. Everything below is what this fork adds, improves, or fixes
 
 ---
 
+## 1.4.6 — 适配 DSH 0.2.1-rc.3（补丁表零漂移）
+
+### 结论先说
+
+rc.3 上**没有一条锚点需要改**。80 条补丁在 0.2.1-rc.3 官方桌面构建上实测
+`applied 63 / already 8 / missing_file 7 / skipped 2 / pending 0`，二次、三次 apply 都是 `applied 0`；
+同一份包集下逐条状态与 rc.2 对照树**完全一致（80/80）**。所以本版只动元数据与自检工具，不动替换文本。
+
+为什么可以这么确定：rc.3 的补丁目标包里**只有一个文件真变了**（`dsh-llm-deepseek/lib/index.js`，新增 `/models`
+列表与模型目录闸门；#69 / #72 的锚点仍在原地），桌面壳 `lib/main.js` 与 rc.2 的差异只有三处——首行空行、
+`"0.2.1-rc.2"` → `"0.2.1-rc.3"`、文件末尾换行。其余目标包（`agent-instructions` / `system-prompt` /
+`user-approval` / `sandbox*` / `tool-*` / `agent-loop` / `settings` …）逐字节未变。
+
+### 改了什么
+
+| 项 | 之前 | 现在 |
+| --- | --- | --- |
+| `dshTarget` | `0.2.1-rc.2` | `0.2.1-rc.3` |
+| 版本号 | 1.4.5 | 1.4.6（`version` + `dsh.version` 同步） |
+| `scripts/compat-check.mjs` 的覆盖范围 | 桌面壳目标键永远为空，#45/#46/#82/#83/#84 一律记成 `missing_file` | 临时树按桌面安装形态搭建（`<tmp>/DeepSeek Harness.exe` + `<tmp>/resources/app/lib/main.js` + `<tmp>/resources/app/dsh/node_modules/...`），`DSH_DESKTOP_INSTALL` 指到临时树，**壳补丁一起校验** |
+| `compat-check` 输出 | 只有文件数 | 多打一行 `shell: lib/main.js` / `not in this build`；新增 `--keep` 保留临时树 |
+| 文档 | 只有 rc.2 的适配报告 | 新增 `docs/compat-0.2.1-rc.3.md`（漂移明细 + 实测数据 + 自查命令） |
+
+### 为什么要补 compat-check 的壳覆盖
+
+1.3.1 那次事故就是「补丁状态看起来正常、语义已经没了」（#40 在 0.2.1 上一条 pattern 都不命中，状态是 `skipped`
+不算失败，但重启前的校验仍拒绝重启）。桌面壳那 5 条比 #40 更隐蔽：`officialShellMain()` 依赖宿主 exe 定位，
+而 `compat-check` 是在临时目录里跑引擎，壳入口落在临时目录之外 → 目标键为空 → 状态一直是 `missing_file`，
+于是「壳锚点在 rc.3 上还成不成立」这件事**从来没被验证过**。
+现在临时树自带 `DeepSeek Harness.exe` 与 `resources/app/lib/main.js`，壳入口就在临时树里，
+换 rc 版本时 `--surface desktop` 一跑就知道 #45/#82/#83/#84 有没有漂。
+
+### 验证
+
+- `node scripts/compat-check.mjs --asar "<rc.3 官方 app.asar>" --surface desktop`：`{"applied":63,"already":8,"missing_file":7,"skipped":2}`，退出码 0。
+- 同一份 rc.3 树的二、三次 apply：`{"applied":0,"already":71,"missing_file":7,"skipped":2}`（幂等）。
+- rc.2 / rc.3 同包集的 `--json` 报告按 `patch_id` 逐条比对：**0 条差异**。
+- 本机已打补丁的 rc.2 安装（`--app "D:/Deepseek harness/resources/app"`）：`{"already":71,"missing_file":7,"skipped":2}`，退出码 0。
+- `node test/gate.mjs`（71 项）、`node test/hostfs-sync.mjs`（20 项）全过；`node --check` 三个入口通过。
+
+### 未处理
+
+- rc.3 扩充了产品遥测（`agent_preset_switch` / `send_button_click.is_new_session` / `more_menu_item_click` /
+  `code_work_view_toggle`）。补丁表从 1.1.x 起就不动 `dsh-client-product-analytics`，本版沿用，只在
+  `docs/compat-0.2.1-rc.3.md` 里记为观察项——要关是另一件事，不该混进「版本适配」。
+- 「零漂移」的结论建立在本机拿到的 rc.3 官方 `app.asar` + npm 全量依赖树之上；它验的是锚点命中，不是语义。
+
+---
+
 ## 1.4.5 — 发版链路与元数据对齐（不动补丁表）
 
 这一版不改宿主文件、不动补丁表（仍是 80 条），只把「怎么发版」和「仓库身份」这两件长期脏活收尾。

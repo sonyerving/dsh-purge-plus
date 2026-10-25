@@ -1,5 +1,7 @@
 # 0.2.1-rc.2 适配报告 / Compatibility note for DSH 0.2.1-rc.2
 
+> 0.2.1-rc.3 的适配记录在 [compat-0.2.1-rc.3.md](compat-0.2.1-rc.3.md)；本文件保留 rc.2 时代（1.3.0 / 1.3.1）的实测过程。
+
 适用版本：dsh-purge **1.3.0**（`dshTarget: 0.2.1-rc.2`，向下兼容 0.2.0-rc.2 / 0.1.x 的旧锚点）。
 
 ## 结论 / Summary
