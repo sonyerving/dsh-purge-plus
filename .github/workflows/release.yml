@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+  # 允许在 Actions 页手动跑一次（工作流启用之前的 push 不会补跑）
+  workflow_dispatch:
 
 permissions:
   contents: write
